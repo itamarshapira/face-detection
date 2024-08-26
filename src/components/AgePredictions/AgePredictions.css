@@ -1,0 +1,19 @@
+.centerAge
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 5px;
+    
+}
+
+.age-predictions {
+    
+    margin-top: 350px; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }

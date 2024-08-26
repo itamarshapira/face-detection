@@ -2,6 +2,15 @@
   text-align: center;
 }
 
+.centerContent {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally */
+  justify-content: center; /* Center children vertically */
+  margin-top: 20px; /* Optional: Add some space from top */
+}
+
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

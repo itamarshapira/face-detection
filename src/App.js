@@ -9,6 +9,7 @@ import Rank from './components/Rank/Rank';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
+import AgePredictions from './components/AgePredictions/AgePredictions';
 
 function App () {
 
@@ -28,7 +29,7 @@ function App () {
   };
 
   // todo: Clarifai down below : ->>
-  const returnClarifaiRequestOption = (imageUrl) =>{ //* my change func that make an order and gets imageUrl
+  const returnClarifaiRequestOption = (imageUrl, modelId = 'face-detection') =>{ //* my change func that make an order and gets imageUrl
     console.log(imageUrl)
     // Your PAT (Personal Access Token) can be found in the Account's Security section
     const PAT = '902245b41f1044c28891cf32ef45fdb2'; //* my change
@@ -113,45 +114,73 @@ const displayFaceBox = (box) => {
   setBox(box);  // Update the state with the new box coordinates
   console.log(box); // Log the box coordinates to verify they are correct
 };
-
  // todo:  ->> end here 
+
+ const [agePredictions, setAgePredictions] = useState([]);
 
   //* onButtonSubmit: Sets the imageUrl state with the current input value,
   //* triggering the FaceRecognition component to display the image.
   // ? and also uses the api doc of clarifi with the help of !section 290! in ZTM to read a doc like a pro !
   const onButtonSubmit = () => {
-    setImageUrl(input); // This will set the imageUrl to the input value when the button is pressed
-    fetch("https://api.clarifai.com/v2/models/" + 'face-detection' +  "/outputs", returnClarifaiRequestOption(input))
-    .then((response) => response.json())
-  .then((result) => {   console.log(result.outputs[0].data.regions) // the output result
-    if (result) { 
-       const faceBox = calculateFaceLocation(result);
-        displayFaceBox(faceBox);
-    }
-    const regions = result.outputs[0].data.regions;
-
-    regions.forEach((region) => {
-      // Accessing and rounding the bounding box values
-      const boundingBox = region.region_info.bounding_box;
-      const topRow = boundingBox.top_row.toFixed(3);
-      const leftCol = boundingBox.left_col.toFixed(3);
-      const bottomRow = boundingBox.bottom_row.toFixed(3);
-      const rightCol = boundingBox.right_col.toFixed(3);
-      
-      region.data.concepts.forEach((concept) => {
-        // Accessing and rounding the concept value *BINARY_POSITIVE*
-        const name = concept.name;
-        const value = concept.value.toFixed(4);
+    setImageUrl(input); // Set the imageUrl to the input value when the button is pressed
+  
+    // Fetching face detection data
+    fetch("https://api.clarifai.com/v2/models/face-detection/outputs", returnClarifaiRequestOption(input))
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result.outputs[0].data.regions); // Output result for debugging
         
-        console.log(
-          `${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`
-        );
-      });
-    });
-  })
-  .catch((error) => console.log("error", error));
+        if (result) {
+          const faceBox = calculateFaceLocation(result);
+          displayFaceBox(faceBox);
+        }
+  
+        // This is the data from face detection to debug:
+        const regions = result.outputs[0].data.regions;
+        if (regions && regions.length > 0) {  // Check if regions exist and have at least one element
+          regions.forEach((region) => {
+            // Accessing and rounding the bounding box values
+            const boundingBox = region.region_info.bounding_box;
+            const topRow = boundingBox.top_row.toFixed(3);
+            const leftCol = boundingBox.left_col.toFixed(3);
+            const bottomRow = boundingBox.bottom_row.toFixed(3);
+            const rightCol = boundingBox.right_col.toFixed(3);
+  
+            if (region.data.concepts) {  // Check if concepts exist
+              region.data.concepts.forEach((concept) => {
+                // Accessing and rounding the concept value *BINARY_POSITIVE*
+                const name = concept.name;
+                const value = concept.value.toFixed(4);
+  
+                console.log(
+                  `${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`
+                );
+              });
+            }
+          });
+        } else {
+          console.log("No face regions detected."); // Log if no regions were detected
+        }
+         
+        // Fetching age detection data using the same image URL
+        // Fetching age detection data using the same image URL
+      return fetch("https://api.clarifai.com/v2/models/age-demographics-recognition/outputs", returnClarifaiRequestOption(input, 'age-demographics-recognition'));
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log("Full Age Detection Result:", result); // Log the entire response for debugging
 
-    console.log('click');
+  const ageConcepts = result.outputs[0].data.concepts;
+  // Get the top 3 age predictions
+  const top3Concepts = ageConcepts.slice(0, 3);
+  console.log("Top 3 Age Predictions:", top3Concepts);
+
+  // Set the top 3 age predictions in the state for rendering
+  setAgePredictions(top3Concepts);
+    })
+    .catch((error) => console.log("Error:", error));
+
+  console.log('click');
   };
 
   return (
@@ -170,9 +199,14 @@ const displayFaceBox = (box) => {
           <Rank />
           {/* ImageLinkForm component where the user can input an image URL and submit it */}
           <ImageLinkForm onInputChange={onInputChange} onButtonSubmit={onButtonSubmit} />
-        
-          {/* FaceRecognition component that shows the image with detected face bounding box */}
+
+          <div className="centerContent">
+             {/* FaceRecognition component that shows the image with detected face bounding box */}
           <FaceRecognition imageUrl={imageUrl} box={box} />
+          
+          <AgePredictions agePredictions={agePredictions} />
+          
+          </div>
         </div>
       ) : (
         isSignedIn==="signin"

@@ -7,9 +7,11 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@tsparticles/react": "^3.0.0",
+    "chart.js": "^4.4.4",
     "clarifai": "^2.9.1",
     "particles-bg": "^2.5.5",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-parallax-tilt": "^1.7.236",
     "react-particles": "^2.12.2",
@@ -40,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
