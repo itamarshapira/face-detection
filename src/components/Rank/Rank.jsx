@@ -1,8 +1,11 @@
-function Rank() {
+import "./Rank.css";
+function Rank({ user }) {
   return (
     <div className="pa3">
-      <div className="white  f3">name, your current rank is ...</div>
-      <div className="white f1">#5</div>
+      <div className="white  f3">
+        Welcome {user.name}, your current ditection is ...
+      </div>
+      <div className="white f1">#{user.detectionCounter}</div>
     </div>
   );
 }

@@ -7,8 +7,7 @@ function FaceRecognition({ imageUrl, box }) {
           id="inputimage"
           src={imageUrl}
           alt=""
-          width="300px"
-          height="auto"
+          className="responsive-image"
         />
         <div
           className="bounding-box"

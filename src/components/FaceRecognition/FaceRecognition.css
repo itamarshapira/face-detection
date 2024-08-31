@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     
+    
 }
 
 .bounding-box {
@@ -12,5 +13,13 @@
     flex-wrap: wrap;
     justify-content: center;
     cursor: pointer;
+  }
+  
+  .responsive-image {
+    width: 300px; /* Keep width fixed */
+    height: auto; /* Allow height to adjust automatically */
+    max-height: 400px; /* Set maximum height */
+    min-height: 270px; /* Set minimum height */
+    /* object-fit: cover;  */
   }
   

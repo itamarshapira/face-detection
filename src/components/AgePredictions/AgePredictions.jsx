@@ -12,7 +12,7 @@ function AgePredictions({ agePredictions }) {
     labels: agePredictions.map((concept) => concept.name),
     datasets: [
       {
-        data: agePredictions.map((concept) => concept.value * 100, "%"),
+        data: agePredictions.map((concept) => concept.value * 100),
 
         backgroundColor: [
           "rgba(0, 128, 0, 0.7)", // Dark green
@@ -25,12 +25,32 @@ function AgePredictions({ agePredictions }) {
     ],
   };
 
+  // Helper function to compute the midpoint of a range
+  const getMidpoint = (range) => {
+    const [start, end] = range.split("-").map(Number);
+    return (start + end) / 2;
+  };
+
+  // Calculate the smart (weighted) average of the top 3 age predictions
+  const totalWeight = agePredictions.reduce(
+    (acc, concept) => acc + concept.value,
+    0
+  );
+  const weightedAverage =
+    agePredictions.reduce(
+      (acc, concept) => acc + concept.value * getMidpoint(concept.name),
+      0
+    ) / totalWeight;
+
   return (
     <div
-      className=" age-predictions "
+      className="age-predictions centerAge"
       style={{ width: "300px", height: "300px" }}
     >
-      <h3>Top 3 Age Predictions:</h3>
+      <p>
+        <h3>Top 3 Age Predictions:</h3>
+        <h4>proximaly Age: {weightedAverage.toFixed(2)}</h4>
+      </p>
       <Pie data={data} />
     </div>
   );
